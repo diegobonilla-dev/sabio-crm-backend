@@ -1,0 +1,140 @@
+import { Router } from 'express';
+import {createFinca, addZonaToFinca, addLoteToZona} from '../controllers/finca.controller.js';
+import { protect } from '../middlewares/auth.middleware.js';
+
+const router = Router();
+
+// Todas las rutas de fincas están protegidas
+router.use(protect);
+
+/**
+ * @swagger
+ * /api/v1/fincas/{empresaId}:
+ *   post:
+ *     summary: Crea una nueva Finca
+ *     tags:
+ *       - Operativo (Fincas)
+ *     description: Crea una nueva finca y la asocia a una Empresa existente.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: empresaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: El ID de la Empresa dueña de la finca.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 example: "Finca La Pradera"
+ *               area:
+ *                 type: number
+ *                 example: 100
+ *               municipio:
+ *                 type: string
+ *                 example: "Medellín"
+ *               departamento:
+ *                 type: string
+ *                 example: "Antioquia"
+ *               cultivo_principal:
+ *                 type: string
+ *                 example: "Café"
+ *     responses:
+ *       '201':
+ *         description: Finca creada exitosamente.
+ */
+
+router.post('/:empresaId', createFinca);
+
+
+/**
+ * @swagger
+ * /api/v1/fincas/{fincaId}/zonas:
+ *   post:
+ *     summary: Añade una nueva Zona a una Finca
+ *     tags:
+ *       - Operativo (Fincas)
+ *     description: Crea un sub-documento de Zona dentro del array 'zonas' de una Finca existente.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: fincaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: El ID de la Finca a la que se añadirá la zona.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre_zona:
+ *                 type: string
+ *                 example: "Zona de Pastoreo 1"
+ *               imagen_zona:
+ *                 type: string
+ *                 example: "http://url.com/imagen.jpg"
+ *     responses:
+ *       '201':
+ *         description: Zona añadida exitosamente. Retorna la nueva zona creada.
+ *       '400':
+ *         description: Falta nombre_zona.
+ *       '404':
+ *         description: Finca no encontrada.
+ */
+router.post('/:fincaId/zonas', addZonaToFinca);
+
+/**
+ * @swagger
+ * /api/v1/fincas/{fincaId}/zonas/{zonaId}/lotes:
+ *   post:
+ *     summary: Añade un nuevo Lote a una Zona
+ *     tags:
+ *       - Operativo (Fincas)
+ *     description: Crea un sub-documento de Lote dentro del array 'lotes' de una Zona específica.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: fincaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: El ID de la Finca.
+ *       - in: path
+ *         name: zonaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: El ID de la Zona (sub-documento) a la que se añadirá el lote.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre_lote:
+ *                 type: string
+ *                 example: "Lote 1A - Arboles Jóvenes"
+ *     responses:
+ *       '201':
+ *         description: Lote añadido exitosamente.
+ *       '400':
+ *         description: Falta nombre_lote.
+ *       '404':
+ *         description: Finca o Zona no encontrada.
+ */
+router.post('/:fincaId/zonas/:zonaId/lotes', addLoteToZona);
+
+export default router;
