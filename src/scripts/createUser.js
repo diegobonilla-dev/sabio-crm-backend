@@ -13,8 +13,8 @@ async function createUser() {
     // DATOS DEL NUEVO USUARIO:
     const userData = {
       name: 'Diego Bonilla',
-      email: 'diego.bonilla@sabio.com.co',
-      password: '2024CoreI9#', // Se encriptará automáticamente
+      email: 'diego.bonilla@udea.edu.co',
+      password: '1234567', // Se encriptará automáticamente
       role: 'sabio_admin' // Cambia según el rol que necesites
     };
 
