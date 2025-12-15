@@ -63,10 +63,21 @@ const fincaSchema = new Schema({
   tipo_produccion: {
     type: String,
     trim: true,
-    enum: ['Cultivo', 'Ganaderia', 'Mixto', 'Otro'],
-    default: 'Cultivo'
+    enum: ['Ganaderia', 'Flores', 'Frutales', 'Cafe', 'Aguacate', 'Mixto', 'Otro'],
+    default: 'Ganaderia'
   },
   cultivo_principal: {
+    type: String,
+    trim: true
+  },
+
+  // --- NUEVOS CAMPOS MÓDULO 4 ---
+  vereda: {
+    type: String,
+    trim: true
+  },
+
+  coordenadas_gps: {
     type: String,
     trim: true
   },

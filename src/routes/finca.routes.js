@@ -1,16 +1,29 @@
 // Archivo: /src/routes/finca.routes.js (Actualizado)
 
 import { Router } from 'express';
-// ¡Importa las funciones renombradas!
-import { 
-  createFinca, 
-  addDivisionPrimaria, 
-  addDivisionSecundaria 
+import {
+  createFinca,
+  getFincas,
+  getFincaById,
+  updateFinca,
+  deleteFinca,
+  asociarCorporativo,
+  addDivisionPrimaria,
+  addDivisionSecundaria
 } from '../controllers/finca.controller.js';
 import { protect } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 router.use(protect);
+
+// CRUD básico
+router.get('/', getFincas);
+router.get('/:id', getFincaById);
+router.put('/:id', updateFinca);
+router.delete('/:id', deleteFinca);
+
+// Asociar corporativo
+router.post('/:fincaId/corporativos/:corporativoId', asociarCorporativo);
 
 /**
  * @swagger
