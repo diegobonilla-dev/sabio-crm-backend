@@ -4,6 +4,7 @@ import userRoutes from './user.routes.js';
 import leadRoutes from './lead.routes.js';
 import authRoutes from './auth.routes.js';
 import fincaRoutes from './finca.routes.js'
+import empresaRoutes from './empresa.routes.js';
 import compostRoutes from './compost.routes.js';
 import laboratorioRoutes from './laboratorio.routes.js';
 import operacionesRoutes from './operaciones.routes.js';
@@ -33,6 +34,8 @@ router.use('/users', userRoutes);
 router.use('/leads', leadRoutes);
 //corporativos
 router.use('/corporativos', corporativoRoutes);
+//empresas
+router.use('/empresas', empresaRoutes);
 //fincas
 router.use('/fincas', fincaRoutes);
 //Recetas
