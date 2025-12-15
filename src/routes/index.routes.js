@@ -8,6 +8,7 @@ import compostRoutes from './compost.routes.js';
 import laboratorioRoutes from './laboratorio.routes.js';
 import operacionesRoutes from './operaciones.routes.js';
 import visitaRoutes from './visita.routes.js'
+import corporativoRoutes from './corporativo.routes.js';
 
 const router = Router();
 
@@ -30,6 +31,8 @@ router.use('/users', userRoutes);
 // Rutas de Leads (CRM)
 // Cuando alguien vaya a "/leads", usa las rutas de lead.routes.js
 router.use('/leads', leadRoutes);
+//corporativos
+router.use('/corporativos', corporativoRoutes);
 //fincas
 router.use('/fincas', fincaRoutes);
 //Recetas

@@ -12,12 +12,16 @@ const corporativoSchema = new Schema({
     type: String,
     trim: true
   },
-  
+  tipo: {
+    type: String,
+    trim: true
+  },
+
   // --- La Relación M-N (Muchos-a-Muchos) ---
   // Guardamos un array de las fincas que este corporativo "supervisa".
   fincas_asociadas: [{
     type: Schema.Types.ObjectId,
-    ref: 'Finca' 
+    ref: 'Finca'
   }]
 }, {
   timestamps: true
