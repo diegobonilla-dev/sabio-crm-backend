@@ -14,26 +14,38 @@ const empresaSchema = new Schema({
   },
   
   // --- Datos de la Empresa (Cliente) ---
-  nombre: {
+  nombre_comercial: {
     type: String,
     required: true,
     trim: true
   },
+
+  razon_social: {
+    type: String,
+    trim: true
+  },
+
   NIT: {
     type: String,
     trim: true,
     unique: true,
     sparse: true // Permite valores nulos pero únicos si existen
   },
+
   plan_activo: {
     type: Boolean,
     default: true
   },
-  
-  // --- Contacto de Contabilidad  ---
-  // Esta es una buena decisión de diseño:
-  // Como los datos de contabilidad son pequeños y solo pertenecen a ESTA empresa,
-  // los *embebemos* directamente en el documento. No necesitamos una colección separada.
+
+  // --- Contacto Principal ---
+  contacto_principal: {
+    nombre: { type: String, trim: true },
+    email: { type: String, trim: true, lowercase: true },
+    telefono: { type: String, trim: true },
+    cargo: { type: String, trim: true }
+  },
+
+  // --- Contacto de Contabilidad ---
   contacto_contabilidad: {
     nombre: { type: String, trim: true },
     email: { type: String, trim: true, lowercase: true },

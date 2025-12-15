@@ -19,7 +19,13 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  
+
+  // Teléfono del usuario
+  telefono: {
+    type: String,
+    trim: true
+  },
+
   // --- JERARQUÍA DE ROLES MEJORADA ---
   role: {
     type: String,
@@ -30,9 +36,10 @@ const userSchema = new Schema({
       'sabio_tecnico',     // Acceso a Empresas/Fincas asignadas
       'sabio_laboratorio', // Acceso a módulos de muestras
 
-      // 2. Roles de Clientes 
-      'cliente_owner',     // El "Dueño" (ligado a una Empresa)
-      'cliente_corporate'  // El "Corporativo" (ligado a un Corporativo)
+      // 2. Roles de Clientes
+      'cliente_owner',        // El "Dueño" (ligado a una Empresa)
+      'cliente_empleado',     // Empleado con acceso limitado a fincas específicas
+      'corporativo_usuario'   // Usuario del Corporativo (ligado a un Corporativo)
     ],
     required: true
   },
@@ -41,20 +48,28 @@ const userSchema = new Schema({
   // Usamos una función 'required' para que este campo solo sea
   // obligatorio si el rol es el correcto.
 
-  // Si el rol es 'cliente_owner', ¿a qué 'Empresa' (dueño) pertenece?
+  // Si el rol es 'cliente_owner' o 'cliente_empleado', ¿a qué 'Empresa' pertenece?
   empresa: {
     type: Schema.Types.ObjectId,
     ref: 'Empresa',
-    required: function() { return this.role === 'cliente_owner'; }
+    required: function() {
+      return this.role === 'cliente_owner' || this.role === 'cliente_empleado';
+    }
   },
 
-  // Si el rol es 'cliente_corporate', ¿a qué 'Corporativo' (Starbucks) pertenece?
+  // Si el rol es 'corporativo_usuario', ¿a qué 'Corporativo' pertenece?
   corporativo: {
     type: Schema.Types.ObjectId,
     ref: 'Corporativo',
-    required: function() { return this.role === 'cliente_corporate'; }
+    required: function() { return this.role === 'corporativo_usuario'; }
   },
-  
+
+  // Para 'cliente_empleado': fincas a las que tiene acceso limitado
+  fincas_acceso: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Finca'
+  }],
+
   // (Opcional) Para 'sabio_tecnico', a qué fincas tiene acceso
   fincas_asignadas_tecnico: [{
     type: Schema.Types.ObjectId,

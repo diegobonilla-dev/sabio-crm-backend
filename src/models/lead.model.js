@@ -22,13 +22,14 @@ const leadSchema = new Schema({
   },
   email: {
     type: String,
+    required: [true, 'El email es obligatorio'],
     trim: true,
     lowercase: true,
-    // Opcional: validación simple de email
     match: [/.+\@.+\..+/, 'Por favor, introduce un email válido']
   },
   telefono: {
     type: String,
+    required: [true, 'El teléfono es obligatorio'],
     trim: true
   },
   
@@ -41,6 +42,20 @@ const leadSchema = new Schema({
   
   // De dónde vino este prospecto
   origen: {
+    type: String,
+    trim: true,
+    enum: ['Web', 'Referido', 'Llamada directa', 'Evento', 'Redes sociales', 'Otro'],
+    default: 'Otro'
+  },
+
+  // Motivo de pérdida (opcional)
+  motivo_perdida: {
+    type: String,
+    trim: true
+  },
+
+  // Notas adicionales
+  notas: {
     type: String,
     trim: true
   },
@@ -65,6 +80,11 @@ const leadSchema = new Schema({
   // timestamps: true añade automáticamente 'createdAt' y 'updatedAt'
   timestamps: true
 });
+
+// Índices para búsquedas eficientes
+leadSchema.index({ owner: 1, etapa_funnel: 1 });
+leadSchema.index({ email: 1 });
+leadSchema.index({ empresa_nombre: 1 });
 
 // Creamos y exportamos el modelo
 const Lead = model('Lead', leadSchema);

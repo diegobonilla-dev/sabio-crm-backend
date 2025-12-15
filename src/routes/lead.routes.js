@@ -1,6 +1,13 @@
 //src/routes/lead.routes.js
 import { Router } from 'express';
-import { createLead, getLeads, convertLeadToEmpresa } from '../controllers/lead.controller.js';
+import {
+  createLead,
+  getLeads,
+  getLeadById,
+  updateLead,
+  deleteLead,
+  convertLeadToEmpresa
+} from '../controllers/lead.controller.js';
 import { protect } from '../middlewares/auth.middleware.js';
 
 const router = Router();
@@ -69,6 +76,71 @@ router.post('/', createLead);
  *         description: No autorizado.
  */
 router.get('/', getLeads);
+
+/**
+ * @swagger
+ * /api/v1/leads/{id}:
+ *   get:
+ *     summary: Obtiene un Lead específico por ID
+ *     tags:
+ *       - CRM (Leads)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Lead encontrado
+ *       '404':
+ *         description: Lead no encontrado
+ */
+router.get('/:id', getLeadById);
+
+/**
+ * @swagger
+ * /api/v1/leads/{id}:
+ *   put:
+ *     summary: Actualiza un Lead
+ *     tags:
+ *       - CRM (Leads)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Lead actualizado exitosamente
+ */
+router.put('/:id', updateLead);
+
+/**
+ * @swagger
+ * /api/v1/leads/{id}:
+ *   delete:
+ *     summary: Elimina un Lead
+ *     tags:
+ *       - CRM (Leads)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Lead eliminado exitosamente
+ */
+router.delete('/:id', deleteLead);
 
 /**
  * @swagger
