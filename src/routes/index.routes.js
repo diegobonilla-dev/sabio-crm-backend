@@ -10,6 +10,7 @@ import laboratorioRoutes from './laboratorio.routes.js';
 import operacionesRoutes from './operaciones.routes.js';
 import visitaRoutes from './visita.routes.js'
 import corporativoRoutes from './corporativo.routes.js';
+import diagnosticoRoutes from './diagnostico.routes.js';
 
 const router = Router();
 
@@ -46,5 +47,7 @@ router.use('/lab', laboratorioRoutes);
 router.use('/operaciones', operacionesRoutes);
 //visitas tecnicas
 router.use('/visitas', visitaRoutes);
+//diagnósticos
+router.use('/diagnosticos', diagnosticoRoutes);
 
 export default router;
