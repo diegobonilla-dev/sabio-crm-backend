@@ -27,32 +27,45 @@ const informacionGeneralSchema = new Schema({
   tiene_registros: { type: Boolean, default: false }
 });
 
+// Subdocumento: Suplemento individual
+const suplementoSchema = new Schema({
+  tipo: { type: String, trim: true },
+  kgDia: { type: Number },
+  precioKg: { type: Number }
+}, { _id: false });
+
+// Subdocumento: Materia seca individual
+const materiaSecaSchema = new Schema({
+  tipo: { type: String, trim: true },
+  porcentaje: { type: Number }
+}, { _id: false });
+
 // Subdocumento: Lote individual (para Paso 2)
-// Representa una unidad productiva en el diagnóstico (ej: grupo de vacas)
-// NO confundir con la división primaria de la finca (estructura organizativa)
+// Representa una unidad productiva en el diagnóstico (ej: grupo de vacas en ordeño)
 const loteSchema = new Schema({
   nombre_lote: { type: String, trim: true },
 
-  // Relacionamiento híbrido con estructura física de la finca
-  // Permite mapear dónde se tomaron las muestras biológicas
-  division_primaria_ref: { type: Schema.Types.ObjectId }, // Ref a divisiones_primarias de Finca
-  division_primaria_nombre: { type: String, trim: true }, // Denormalizado: "Lote Norte"
-  division_secundaria_ref: { type: Schema.Types.ObjectId }, // Ref a divisiones_secundarias
-  division_secundaria_nombre: { type: String, trim: true }, // Denormalizado: "Potrero Alto"
-  division_terciaria_ref: { type: Schema.Types.ObjectId }, // Ref a divisiones_terciarias
-  division_terciaria_nombre: { type: String, trim: true }, // Denormalizado: "Franja 3"
-  ubicacion_detalle: { type: String, trim: true }, // Ej: "Zona de ladera", "Cerca del río"
+  // Producción de leche
+  total_litros: { type: Number },
+  periodo_litros: { type: String, enum: ['litros_dia', 'litros_mes'], default: 'litros_dia' },
+  total_litros_305_dias: { type: Number }, // Opcional
 
-  // Datos productivos (específicos de ganadería)
-  total_litros_dia: { type: Number },
+  // Animales
   numero_vacas_ordeno: { type: Number },
-  precio_venta_leche: { type: Number },
-  concentrado_total_kg: { type: Number },
-  precio_concentrado_kg: { type: Number },
-  usa_suplemento: { type: Boolean, default: false },
-  tipo_suplemento: { type: String, trim: true },
   raza_predominante: { type: String, trim: true },
-  peso_promedio_vacas: { type: Number }
+  peso_promedio_vaca: { type: Number },
+
+  // Costos de producción
+  precio_venta_leche: { type: Number },
+  concentrado_total_kg_dia: { type: Number },
+  precio_concentrado_kg: { type: Number },
+
+  // Suplementación
+  usa_suplemento: { type: Boolean, default: false },
+  suplementos: [suplementoSchema], // Array de suplementos
+
+  // Materia seca
+  materia_seca: [materiaSecaSchema] // Array de tipos de materia seca
 }, { _id: true });
 
 // Subdocumento: Datos específicos Ganadería (10 pasos)
