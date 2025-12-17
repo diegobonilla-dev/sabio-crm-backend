@@ -2,9 +2,10 @@
 
 import { Schema, model } from 'mongoose';
 
-// --- ESQUEMA EMBEBIDO #1: DIVISION SECUNDARIA (Antes Lote) ---
-// Representa la división más pequeña (Lote, Franja, Cama, etc.)
-const divisionSecundariaSchema = new Schema({
+// --- ESQUEMA EMBEBIDO #1: DIVISION TERCIARIA ---
+// Nivel más granular (Franja, Cama, Plato, Surco, etc.)
+// Se usa para mapeo biológico en diagnósticos
+const divisionTerciariaSchema = new Schema({
   nombre: {
     type: String,
     required: true,
@@ -12,8 +13,20 @@ const divisionSecundariaSchema = new Schema({
   }
 });
 
-// --- ESQUEMA EMBEBIDO #2: DIVISION PRIMARIA (Antes Zona) ---
-// Representa la división principal (Zona, Potrero, Parcela, etc.)
+// --- ESQUEMA EMBEBIDO #2: DIVISION SECUNDARIA ---
+// Nivel intermedio (Potrero, Nave, Sección, etc.)
+const divisionSecundariaSchema = new Schema({
+  nombre: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  // Cada División Secundaria tiene su propio array de Divisiones Terciarias
+  divisiones_terciarias: [divisionTerciariaSchema]
+});
+
+// --- ESQUEMA EMBEBIDO #3: DIVISION PRIMARIA ---
+// Nivel más alto de organización (Lote, Bloque, etc.)
 const divisionPrimariaSchema = new Schema({
   nombre: {
     type: String,
@@ -24,7 +37,7 @@ const divisionPrimariaSchema = new Schema({
     type: String // URL de Cloudinary o S3
   },
   // Cada División Primaria tiene su propio array de Divisiones Secundarias
-  divisiones_secundarias: [divisionSecundariaSchema] 
+  divisiones_secundarias: [divisionSecundariaSchema]
 });
 
 // --- ESQUEMA PRINCIPAL: FINCA ---
@@ -39,7 +52,7 @@ const fincaSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Corporativo'
   }],
-  
+
   // --- Datos de la Finca ---
   nombre: {
     type: String,
@@ -58,7 +71,7 @@ const fincaSchema = new Schema({
     type: String,
     trim: true
   },
-  
+
   // --- CAMPO CLAVE PARA LA FLEXIBILIDAD (de NOTES.md) ---
   tipo_produccion: {
     type: String,
@@ -82,8 +95,11 @@ const fincaSchema = new Schema({
     trim: true
   },
 
-  // --- LA ESTRUCTURA EMBEBIDA GENÉRICA ---
-  // Reemplaza a 'zonas'
+  // --- LA ESTRUCTURA EMBEBIDA GENÉRICA (3 NIVELES) ---
+  // Nomenclatura según tipo_produccion:
+  // Ganaderia: Lote → Potrero → Franja
+  // Flores: Bloque → Nave → Cama
+  // Frutales: Lote → Sección → Plato
   divisiones_primarias: [divisionPrimariaSchema]
 
 }, {

@@ -2,19 +2,48 @@ import { Schema, model } from 'mongoose';
 
 // Subdocumento: Información General (común a todos)
 const informacionGeneralSchema = new Schema({
+  // Contacto principal
   telefono_cliente: { type: String, trim: true },
+
+  // Contacto de quien atiende la visita (nuevo)
+  nombre_quien_atiende: { type: String, trim: true },
+  telefono_quien_atiende: { type: String, trim: true },
+
+  // Compradores/Corporativos (nuevo)
+  compradores_corporativos: [{ type: String, trim: true }],
+
+  // Caja de compensación (nuevo)
+  caja_compensacion: { type: String, trim: true },
+
+  // Ubicación y dimensiones
   coordenadas_gps: { type: String, trim: true },
-  area_dedicada: { type: Number },
+  area_dedicada: { type: Number }, // Label dinámico en UI según tipo de finca
   area_reserva: { type: Number },
-  numero_divisiones: { type: Number },
+  numero_divisiones: { type: Number }, // "Potreros", "Bloques", etc. según tipo
+
+  // Información adicional
   tiene_mapas: { type: Boolean, default: false },
   tendencia_climatica: { type: String, trim: true },
   tiene_registros: { type: Boolean, default: false }
 });
 
 // Subdocumento: Lote individual (para Paso 2)
+// Representa una unidad productiva en el diagnóstico (ej: grupo de vacas)
+// NO confundir con la división primaria de la finca (estructura organizativa)
 const loteSchema = new Schema({
   nombre_lote: { type: String, trim: true },
+
+  // Relacionamiento híbrido con estructura física de la finca
+  // Permite mapear dónde se tomaron las muestras biológicas
+  division_primaria_ref: { type: Schema.Types.ObjectId }, // Ref a divisiones_primarias de Finca
+  division_primaria_nombre: { type: String, trim: true }, // Denormalizado: "Lote Norte"
+  division_secundaria_ref: { type: Schema.Types.ObjectId }, // Ref a divisiones_secundarias
+  division_secundaria_nombre: { type: String, trim: true }, // Denormalizado: "Potrero Alto"
+  division_terciaria_ref: { type: Schema.Types.ObjectId }, // Ref a divisiones_terciarias
+  division_terciaria_nombre: { type: String, trim: true }, // Denormalizado: "Franja 3"
+  ubicacion_detalle: { type: String, trim: true }, // Ej: "Zona de ladera", "Cerca del río"
+
+  // Datos productivos (específicos de ganadería)
   total_litros_dia: { type: Number },
   numero_vacas_ordeno: { type: Number },
   precio_venta_leche: { type: Number },
