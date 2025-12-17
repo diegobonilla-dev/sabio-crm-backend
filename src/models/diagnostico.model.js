@@ -92,6 +92,30 @@ const datosGanaderiaSchema = new Schema({
   observaciones: Schema.Types.Mixed
 });
 
+// Subdocumento: Lote frutal individual (para Paso 2 de Frutales)
+const loteFrutalSchema = new Schema({
+  nombre_lote: { type: String, trim: true },
+
+  // Información del cultivo
+  arboles_por_ha: { type: Number },
+  edad_siembra: { type: Number }, // Años desde plantación
+  edad_produccion: { type: Number }, // Años en producción real
+  notas_edad: { type: String, trim: true }, // Notas sobre resiembras/variaciones
+
+  // Producción
+  rendimiento_ha: { type: Number }, // kg/ha
+  periodo_rendimiento: { type: String, enum: ['Anual', 'Por ciclo', 'Por cosecha', 'Traviesa'], default: 'Anual' },
+  produccion_promedio_arbol: { type: Number }, // kg/árbol (opcional/calculable)
+
+  // Calidad y pérdidas
+  porcentaje_exportacion: { type: Number }, // % fruta de primera calidad
+  tasa_descarte: { type: Number }, // % descarte por plaga/enfermedad
+
+  // Riego y costos
+  tipo_riego: { type: String, enum: ['Gravedad', 'Aspersores', 'Goteo', 'Manguera'], trim: true },
+  precio_venta_kg: { type: Number }
+}, { _id: true });
+
 // Subdocumentos para otros tipos (definir después)
 const datosFloresSchema = new Schema({
   // TODO: Definir campos específicos
@@ -99,7 +123,18 @@ const datosFloresSchema = new Schema({
 });
 
 const datosFrutalesSchema = new Schema({
-  datos: Schema.Types.Mixed
+  // Paso 2: Sistema Productivo Frutales
+  sistema_productivo: {
+    cuantos_lotes_productivos: { type: Number, default: 0 },
+    lotes: [loteFrutalSchema]  // Array de lotes frutales dinámicos
+  },
+
+  // Paso 3-10: (definir según necesidad)
+  manejo_sanitario: Schema.Types.Mixed,
+  fertilizacion: Schema.Types.Mixed,
+  cosecha_poscosecha: Schema.Types.Mixed,
+  aspectos_economicos: Schema.Types.Mixed,
+  observaciones: Schema.Types.Mixed
 });
 
 const datosCafeSchema = new Schema({
