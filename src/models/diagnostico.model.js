@@ -12,13 +12,26 @@ const informacionGeneralSchema = new Schema({
   tiene_registros: { type: Boolean, default: false }
 });
 
+// Subdocumento: Lote individual (para Paso 2)
+const loteSchema = new Schema({
+  nombre_lote: { type: String, trim: true },
+  total_litros_dia: { type: Number },
+  numero_vacas_ordeno: { type: Number },
+  precio_venta_leche: { type: Number },
+  concentrado_total_kg: { type: Number },
+  precio_concentrado_kg: { type: Number },
+  usa_suplemento: { type: Boolean, default: false },
+  tipo_suplemento: { type: String, trim: true },
+  raza_predominante: { type: String, trim: true },
+  peso_promedio_vacas: { type: Number }
+}, { _id: true });
+
 // Subdocumento: Datos específicos Ganadería (10 pasos)
 const datosGanaderiaSchema = new Schema({
-  // Paso 2: Sistema Productivo
+  // Paso 2: Sistema Productivo y Animales
   sistema_productivo: {
-    tipo_sistema: String,
-    raza_predominante: String,
-    numero_animales: Number
+    cuantos_lotes_alta_produccion: { type: Number, default: 0 },
+    lotes: [loteSchema]  // Array de lotes dinámicos
   },
 
   // Paso 3: Manejo de Pastoreo
