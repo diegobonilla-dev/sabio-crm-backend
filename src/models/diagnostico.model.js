@@ -116,10 +116,48 @@ const loteFrutalSchema = new Schema({
   precio_venta_kg: { type: Number }
 }, { _id: true });
 
+// Subdocumento: Nutriente individual (para Flores)
+const nutrienteSchema = new Schema({
+  nombre: { type: String, trim: true },
+  cantidad: { type: Number },
+  valor: { type: Number }
+}, { _id: false });
+
+// Subdocumento: Bloque floral individual (para Paso 2 de Flores)
+const bloqueFloralSchema = new Schema({
+  nombre_bloque: { type: String, trim: true },
+
+  // Producción
+  tallos_cosechados: { type: Number },
+  porcentaje_exportacion: { type: Number }, // % Calidad Extra
+  tiempo_ciclo_cosecha: { type: Number }, // Meses
+  tasa_descarte: { type: Number }, // % Rechazo en poscosecha
+
+  // Nutrientes y costos
+  nutrientes: [nutrienteSchema], // Array de nutrientes/fertilizantes
+  precio_venta_kg: { type: Number },
+
+  // Indicadores económicos del bloque
+  costo_por_tallo: { type: Number },
+  ingreso_neto_m2: { type: Number },
+  porcentaje_costos_variables: { type: Number },
+  productividad_mano_obra: { type: Number } // Tallos/jornal
+}, { _id: true });
+
 // Subdocumentos para otros tipos (definir después)
 const datosFloresSchema = new Schema({
-  // TODO: Definir campos específicos
-  datos: Schema.Types.Mixed
+  // Paso 2: Sistema Productivo Flores
+  sistema_productivo: {
+    cuantos_bloques_productivos: { type: Number, default: 0 },
+    bloques: [bloqueFloralSchema]  // Array de bloques florales dinámicos
+  },
+
+  // Paso 3-10: (definir según necesidad)
+  manejo_sanitario: Schema.Types.Mixed,
+  fertilizacion: Schema.Types.Mixed,
+  cosecha_poscosecha: Schema.Types.Mixed,
+  aspectos_economicos: Schema.Types.Mixed,
+  observaciones: Schema.Types.Mixed
 });
 
 const datosFrutalesSchema = new Schema({
