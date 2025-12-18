@@ -40,6 +40,34 @@ const materiaSecaSchema = new Schema({
   porcentaje: { type: Number }
 }, { _id: false });
 
+// Subdocumento: Producto químico individual (Paso 3)
+const productoQuimicoSchema = new Schema({
+  nombre_producto: { type: String, trim: true },
+  formula_npk: { type: String, trim: true },
+  bultos_por_ha: { type: Number },
+  periodo: { type: String, enum: ['rotacion', 'ciclo', 'anual'] },
+  costo_por_bulto: { type: Number }
+}, { _id: false });
+
+// Subdocumento: Insecticida individual (Paso 3)
+const insecticidaSchema = new Schema({
+  nombre_comercial: { type: String, trim: true },
+  ingrediente_activo: { type: String, trim: true },
+  dosis: { type: Number },
+  unidad_dosis: { type: String, enum: ['ml/200L', 'cc/L'] }
+}, { _id: false });
+
+// Subdocumento: Lote diferenciado (Paso 3)
+const loteDiferenciadoSchema = new Schema({
+  nombre_lote: { type: String, trim: true },
+  usa_fertilizacion_quimica: { type: Boolean },
+  productos_quimicos: [productoQuimicoSchema],
+  usa_abono_organico: { type: Boolean },
+  usa_fumigacion: { type: Boolean },
+  insecticidas: [insecticidaSchema],
+  observaciones: { type: String, trim: true }
+}, { _id: true });
+
 // Subdocumento: Lote individual (para Paso 2)
 // Representa una unidad productiva en el diagnóstico (ej: grupo de vacas en ordeño)
 const loteSchema = new Schema({
@@ -76,14 +104,64 @@ const datosGanaderiaSchema = new Schema({
     lotes: [loteSchema]  // Array de lotes dinámicos
   },
 
-  // Paso 3: Manejo de Pastoreo
+  // Paso 3: Fertilización y Fumigación
+  fertilizacion_fumigacion: {
+    general: {
+      // Fertilización química
+      usa_fertilizacion_quimica: { type: Boolean },
+      costo_ultimo_ano_fertilizacion: { type: Number },
+      costo_fertilizacion_es_aproximado: { type: Boolean },
+      productos_quimicos: [productoQuimicoSchema],
+
+      // Abono orgánico
+      usa_abono_organico: { type: Boolean },
+      tipo_abono_organico: { type: String, enum: ['CASERO', 'COMERCIAL'] },
+      costo_abono_organico: { type: Number },
+      unidad_costo_abono: { type: String, enum: ['bulto', 'kg'] },
+
+      // Fertilización foliar
+      usa_fertilizante_foliar: { type: Boolean },
+      tipos_aplicacion: [{ type: String }], // ['Granular', 'Liquido', 'Foliar']
+
+      // Fumigación
+      usa_fumigacion: { type: Boolean },
+      sistemas_fumigacion: [{ type: String }],
+      otro_sistema_fumigacion: { type: String, trim: true },
+      costo_anual_venenos: { type: Number },
+      costo_venenos_es_aproximado: { type: Boolean },
+
+      // Productos de fumigación
+      insecticidas: [insecticidaSchema],
+      fungicida: {
+        nombre_comercial: { type: String, trim: true },
+        ingrediente_activo: { type: String, trim: true },
+        dosis: { type: Number }
+      },
+      coadyuvante: {
+        nombre_comercial: { type: String, trim: true },
+        ingrediente_activo: { type: String, trim: true },
+        dosis: { type: Number }
+      },
+
+      // Rotación
+      tiene_plan_rotacion: { type: Boolean },
+      rotacion_dias: { type: Number }
+    },
+
+    // Manejo diferencial opcional
+    tiene_manejo_diferencial: { type: Boolean },
+    cuantos_lotes_diferenciados: { type: Number, default: 0 },
+    lotes_diferenciados: [loteDiferenciadoSchema]
+  },
+
+  // Paso 4: Manejo de Pastoreo
   manejo_pastoreo: {
     sistema_pastoreo: String,
     rotacion_dias: Number
   },
 
-  // Paso 4-10: (definir según necesidad)
-  fertilizacion: Schema.Types.Mixed,
+  // Paso 5-10: (definir según necesidad)
+  fertilizacion: Schema.Types.Mixed, // DEPRECATED - Se movió a fertilizacion_fumigacion en Paso 3
   sanidad_animal: Schema.Types.Mixed,
   alimentacion: Schema.Types.Mixed,
   reproduccion: Schema.Types.Mixed,
@@ -152,9 +230,59 @@ const datosFloresSchema = new Schema({
     bloques: [bloqueFloralSchema]  // Array de bloques florales dinámicos
   },
 
-  // Paso 3-10: (definir según necesidad)
+  // Paso 3: Fertilización y Fumigación
+  fertilizacion_fumigacion: {
+    general: {
+      // Fertilización química
+      usa_fertilizacion_quimica: { type: Boolean },
+      costo_ultimo_ano_fertilizacion: { type: Number },
+      costo_fertilizacion_es_aproximado: { type: Boolean },
+      productos_quimicos: [productoQuimicoSchema],
+
+      // Abono orgánico
+      usa_abono_organico: { type: Boolean },
+      tipo_abono_organico: { type: String, enum: ['CASERO', 'COMERCIAL'] },
+      costo_abono_organico: { type: Number },
+      unidad_costo_abono: { type: String, enum: ['bulto', 'kg'] },
+
+      // Fertilización foliar
+      usa_fertilizante_foliar: { type: Boolean },
+      tipos_aplicacion: [{ type: String }],
+
+      // Fumigación
+      usa_fumigacion: { type: Boolean },
+      sistemas_fumigacion: [{ type: String }],
+      otro_sistema_fumigacion: { type: String, trim: true },
+      costo_anual_venenos: { type: Number },
+      costo_venenos_es_aproximado: { type: Boolean },
+
+      // Productos de fumigación
+      insecticidas: [insecticidaSchema],
+      fungicida: {
+        nombre_comercial: { type: String, trim: true },
+        ingrediente_activo: { type: String, trim: true },
+        dosis: { type: Number }
+      },
+      coadyuvante: {
+        nombre_comercial: { type: String, trim: true },
+        ingrediente_activo: { type: String, trim: true },
+        dosis: { type: Number }
+      },
+
+      // Rotación
+      tiene_plan_rotacion: { type: Boolean },
+      rotacion_dias: { type: Number }
+    },
+
+    // Manejo diferencial opcional
+    tiene_manejo_diferencial: { type: Boolean },
+    cuantos_lotes_diferenciados: { type: Number, default: 0 },
+    lotes_diferenciados: [loteDiferenciadoSchema]
+  },
+
+  // Paso 4-10: (definir según necesidad)
   manejo_sanitario: Schema.Types.Mixed,
-  fertilizacion: Schema.Types.Mixed,
+  fertilizacion: Schema.Types.Mixed, // DEPRECATED - Se movió a fertilizacion_fumigacion en Paso 3
   cosecha_poscosecha: Schema.Types.Mixed,
   aspectos_economicos: Schema.Types.Mixed,
   observaciones: Schema.Types.Mixed
@@ -167,9 +295,59 @@ const datosFrutalesSchema = new Schema({
     lotes: [loteFrutalSchema]  // Array de lotes frutales dinámicos
   },
 
-  // Paso 3-10: (definir según necesidad)
+  // Paso 3: Fertilización y Fumigación
+  fertilizacion_fumigacion: {
+    general: {
+      // Fertilización química
+      usa_fertilizacion_quimica: { type: Boolean },
+      costo_ultimo_ano_fertilizacion: { type: Number },
+      costo_fertilizacion_es_aproximado: { type: Boolean },
+      productos_quimicos: [productoQuimicoSchema],
+
+      // Abono orgánico
+      usa_abono_organico: { type: Boolean },
+      tipo_abono_organico: { type: String, enum: ['CASERO', 'COMERCIAL'] },
+      costo_abono_organico: { type: Number },
+      unidad_costo_abono: { type: String, enum: ['bulto', 'kg'] },
+
+      // Fertilización foliar
+      usa_fertilizante_foliar: { type: Boolean },
+      tipos_aplicacion: [{ type: String }],
+
+      // Fumigación
+      usa_fumigacion: { type: Boolean },
+      sistemas_fumigacion: [{ type: String }],
+      otro_sistema_fumigacion: { type: String, trim: true },
+      costo_anual_venenos: { type: Number },
+      costo_venenos_es_aproximado: { type: Boolean },
+
+      // Productos de fumigación
+      insecticidas: [insecticidaSchema],
+      fungicida: {
+        nombre_comercial: { type: String, trim: true },
+        ingrediente_activo: { type: String, trim: true },
+        dosis: { type: Number }
+      },
+      coadyuvante: {
+        nombre_comercial: { type: String, trim: true },
+        ingrediente_activo: { type: String, trim: true },
+        dosis: { type: Number }
+      },
+
+      // Rotación
+      tiene_plan_rotacion: { type: Boolean },
+      rotacion_dias: { type: Number }
+    },
+
+    // Manejo diferencial opcional
+    tiene_manejo_diferencial: { type: Boolean },
+    cuantos_lotes_diferenciados: { type: Number, default: 0 },
+    lotes_diferenciados: [loteDiferenciadoSchema]
+  },
+
+  // Paso 4-10: (definir según necesidad)
   manejo_sanitario: Schema.Types.Mixed,
-  fertilizacion: Schema.Types.Mixed,
+  fertilizacion: Schema.Types.Mixed, // DEPRECATED - Se movió a fertilizacion_fumigacion en Paso 3
   cosecha_poscosecha: Schema.Types.Mixed,
   aspectos_economicos: Schema.Types.Mixed,
   observaciones: Schema.Types.Mixed
