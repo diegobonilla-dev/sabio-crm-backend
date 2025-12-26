@@ -846,6 +846,163 @@ const datosAguacateSchema = new Schema({
   datos: Schema.Types.Mixed
 });
 
+// PASO 5: INDICADORES P4G (Común para todos los tipos de finca)
+const indicadoresP4GSchema = new Schema({
+  // Sección A: Resiliencia Percibida (escala 1-5)
+  resiliencia_percibida: {
+    preparacion_cambios_climaticos: {
+      type: Number,
+      min: 1,
+      max: 5
+    },
+    conocimientos_manejo_sostenible: {
+      type: Number,
+      min: 1,
+      max: 5
+    },
+    capacidad_recuperacion_clima_extremo: {
+      type: Number,
+      min: 1,
+      max: 5
+    },
+    estabilidad_economica_inversion: {
+      type: Number,
+      min: 1,
+      max: 5
+    }
+  },
+
+  // Sección B: Impacto Social y de Género
+  impacto_social_genero: {
+    quien_toma_decisiones: {
+      type: String,
+      enum: ['Solo hombres', 'Solo mujeres', 'Conjunto hombre-mujer', 'Otros']
+    },
+
+    // Beneficiarios directos SaBio
+    hombres_beneficiarios_directos_sabio: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+    hombres_trabajadores_empresa: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+    mujeres_beneficiarias_directas_sabio: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+    mujeres_trabajadoras_empresa: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+
+    // Beneficiarios indirectos
+    hombres_beneficiarios_indirectos: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+    mujeres_beneficiarias_indirectas: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+
+    // Generación de nuevos empleos
+    genera_nuevos_empleos: {
+      type: Boolean,
+      default: false
+    },
+    empleos_masculinos_nuevos: {
+      type: Number,
+      min: 0
+    },
+    empleos_femeninos_nuevos: {
+      type: Number,
+      min: 0
+    },
+    tipo_empleos_nuevos: {
+      type: String,
+      trim: true
+    },
+
+    // NPS - Net Promoter Score
+    probabilidad_recomendar_sabio: {
+      type: Number,
+      min: 0,
+      max: 10
+    },
+    razon_calificacion: {
+      type: String,
+      trim: true
+    }
+  }
+}, { _id: false });
+
+// PASO 6: SOSTENIBILIDAD Y DISPOSICIÓN AL CAMBIO (Común para todos los tipos de finca)
+const sostenibilidadSchema = new Schema({
+  // Conocimiento de prácticas regenerativas
+  conoce_practicas_regenerativas: {
+    type: Boolean
+  },
+  cuales_practicas_regenerativas: {
+    type: String,
+    trim: true
+  },
+
+  // Participación en proyectos sostenibles
+  ha_participado_proyectos_sostenibles: {
+    type: Boolean
+  },
+  cuales_proyectos_sostenibles: {
+    type: String,
+    trim: true
+  },
+
+  // Interés en innovaciones
+  interes_innovaciones: {
+    type: String,
+    enum: ['Sí', 'No', 'Parcial']
+  },
+
+  // Consulta experiencias de otras fincas
+  pregunta_experiencias_otras_fincas: {
+    type: Boolean
+  },
+
+  // Asistencia técnica
+  cuenta_asistencia_tecnica: {
+    type: Boolean
+  },
+  proveedor_asistencia: {
+    type: String,
+    trim: true
+  },
+
+  // Metas/visión para la finca
+  metas_vision_finca: {
+    type: String,
+    enum: ['Ninguna definida', 'Productividad', 'Regeneración', 'Sucesión familiar']
+  },
+
+  // Actitud hacia microbiología del suelo
+  actitud_microbiologia_suelo: {
+    type: String,
+    enum: ['Abierto', 'Escéptico', 'Entusiasta']
+  },
+
+  // Nivel de tecnificación
+  nivel_tecnificacion: {
+    type: String,
+    enum: ['Bajo', 'Medio', 'Alto']
+  }
+}, { _id: false });
+
 // Modelo principal
 const diagnosticoSchema = new Schema({
   // Relaciones
@@ -892,7 +1049,13 @@ const diagnosticoSchema = new Schema({
   datos_flores: datosFloresSchema,
   datos_frutales: datosFrutalesSchema,
   datos_cafe: datosCafeSchema,
-  datos_aguacate: datosAguacateSchema
+  datos_aguacate: datosAguacateSchema,
+
+  // PASO 5: Indicadores P4G (común para todos los tipos)
+  indicadores_p4g: indicadoresP4GSchema,
+
+  // PASO 6: Sostenibilidad y Disposición al Cambio (común para todos los tipos)
+  sostenibilidad: sostenibilidadSchema
 
 }, {
   timestamps: true

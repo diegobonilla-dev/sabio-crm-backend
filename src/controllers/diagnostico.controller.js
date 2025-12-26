@@ -117,7 +117,9 @@ export const updateDiagnostico = asyncHandler(async (req, res) => {
     'datos_flores',
     'datos_frutales',
     'datos_cafe',
-    'datos_aguacate'
+    'datos_aguacate',
+    'indicadores_p4g',
+    'sostenibilidad'
   ];
 
   camposPermitidos.forEach(campo => {
