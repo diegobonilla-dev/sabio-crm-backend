@@ -1003,6 +1003,86 @@ const sostenibilidadSchema = new Schema({
   }
 }, { _id: false });
 
+// PASO 7: BIOFÁBRICA DEL CLIENTE (Común para todos los tipos de finca)
+const biofabricaSchema = new Schema({
+  // Sección 1: Experiencia Previa y Dificultades
+  experiencia_previa: {
+    tiene_experiencia: {
+      type: Boolean
+    },
+    resultado_anterior: {
+      type: String,
+      enum: ['Bien', 'Mal']
+    },
+    dificultades_encontradas: [{
+      type: String,
+      enum: ['Tiempo', 'Costo', 'Insumos', 'Claridad', 'Disciplina', 'Ver resultados']
+    }]
+  },
+
+  // Sección 2: Procesos y Prácticas Actuales
+  procesos_actuales: {
+    tiene_biofabrica_compostadero: {
+      type: Boolean,
+      default: false
+    },
+    tiene_lombricultivo: {
+      type: Boolean,
+      default: false
+    },
+    tiene_fermentos: {
+      type: Boolean,
+      default: false
+    },
+    tiene_bokashi: {
+      type: Boolean,
+      default: false
+    },
+    tiene_compostaje: {
+      type: Boolean,
+      default: false
+    },
+    tiene_cultivos_microbios: {
+      type: Boolean,
+      default: false
+    },
+    ha_invertido_infraestructura: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  // Sección 3: Observaciones y Evidencia
+  observaciones: {
+    detalle_proceso_observado: {
+      type: String,
+      trim: true
+    },
+    nivel_organizacion_tecnificacion: {
+      type: String,
+      enum: ['Artesanal', 'Básico', 'Organizado', 'Tecnificado']
+    },
+    nivel_registro: {
+      type: String,
+      enum: ['No hay', 'Poco en papel', 'Se monitorea constante', 'Digital']
+    },
+    potencial_escalabilidad: {
+      type: String,
+      enum: ['Bajo', 'Medio', 'Alto']
+    },
+    puntos_criticos: [{
+      type: String,
+      enum: ['Calidad de agua', 'Tiempo de proceso', 'Calidad de insumos', 'Otros']
+    }],
+    foto_evidencia: {
+      type: String  // Base64 o URL
+    },
+    video_evidencia: {
+      type: String  // URL
+    }
+  }
+}, { _id: false });
+
 // Modelo principal
 const diagnosticoSchema = new Schema({
   // Relaciones
@@ -1055,7 +1135,10 @@ const diagnosticoSchema = new Schema({
   indicadores_p4g: indicadoresP4GSchema,
 
   // PASO 6: Sostenibilidad y Disposición al Cambio (común para todos los tipos)
-  sostenibilidad: sostenibilidadSchema
+  sostenibilidad: sostenibilidadSchema,
+
+  // PASO 7: Biofábrica del Cliente (común para todos los tipos)
+  biofabrica: biofabricaSchema
 
 }, {
   timestamps: true
