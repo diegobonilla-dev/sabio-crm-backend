@@ -68,6 +68,144 @@ const loteDiferenciadoSchema = new Schema({
   observaciones: { type: String, trim: true }
 }, { _id: true });
 
+// ============================================
+// PASO 4: MANEJO DE PASTOREO Y FORRAJES
+// ============================================
+
+// Subdocumento: Especie de pasto predominante
+const especiePastoSchema = new Schema({
+  especie: { type: String, trim: true },
+  orden: { type: Number } // 1, 2, 3
+}, { _id: false });
+
+// Subdocumento: Punto de muestreo individual
+const puntoMuestreoSchema = new Schema({
+  coordenada_gps: { type: String, trim: true },
+  pendiente_porcentaje: { type: Number, min: 0, max: 45 },
+  aspecto_pendiente: {
+    type: String,
+    enum: ['N', 'S', 'E', 'O', 'NE', 'NO', 'SE', 'SO']
+  },
+
+  // VESS (Visual Evaluation of Soil Structure)
+  vess_colchon_pasto: { type: Number, enum: [1, 2, 3] },
+  vess_suelo: { type: Number, enum: [1, 2, 3, 4, 5] },
+
+  // Características del suelo
+  textura_predominante: {
+    type: String,
+    enum: ['Arenosa', 'Franca', 'Arcillosa']
+  },
+  color_predominante: {
+    type: String,
+    enum: ['Oscuro', 'Claro', 'Rojizo']
+  },
+  olor_predominante: {
+    type: String,
+    enum: ['Orgánico', 'Áspero', 'Ácido', 'Neutro']
+  },
+
+  // Compactación
+  penetrometro_200psi_cm: { type: Number, min: 0, max: 90 },
+  nivel_compactacion: {
+    type: String,
+    enum: ['Bajo', 'Medio', 'Alto']
+  },
+  evidencia_compactacion_superficial: { type: Boolean },
+
+  // Condiciones
+  drenaje: {
+    type: String,
+    enum: ['Adecuado', 'Deficiente']
+  },
+  evidencia_erosion: { type: Boolean },
+
+  // Salud del pasto
+  puntuacion_salud_pasto: { type: Number, enum: [0, 1, 2, 3] },
+  especies_no_deseadas_presentes: { type: Boolean },
+  nivel_especies_no_deseadas: {
+    type: String,
+    enum: ['Bajo', 'Medio', 'Alto']
+  },
+  sintomas_estres: [{
+    type: String,
+    enum: ['Sequía', 'Sobrepastoreo', 'Plagas', 'Ninguno']
+  }],
+
+  // Biodiversidad
+  lombrices_rojas: { type: Number, default: 0 },
+  lombrices_grises: { type: Number, default: 0 },
+  lombrices_blancas: { type: Number, default: 0 },
+  huevos_lombrices: { type: Number, default: 0 },
+  tipos_diferentes_huevos: { type: Number, default: 0 },
+  presencia_micelio_hongos: {
+    type: String,
+    enum: ['Abundante', 'Moderado', 'Poco', 'Ninguno']
+  },
+  raices_activas_visibles: {
+    type: String,
+    enum: ['Abundante', 'Moderado', 'Poco', 'Ninguno']
+  },
+
+  // Fotos (placeholders - URLs cuando se implemente upload)
+  foto_salud_pasto_calidad: { type: String, trim: true },
+  foto_salud_pasto_raiz: { type: String, trim: true },
+  foto_perfil_suelo: { type: String, trim: true },
+
+  // Observaciones
+  observaciones_punto: { type: String, trim: true }
+}, { _id: true });
+
+// Subdocumento: Plaga/Enfermedad individual
+const plagaEnfermedadSchema = new Schema({
+  nombre: { type: String, trim: true },
+  nivel_dano: {
+    type: String,
+    enum: ['sin_dano', 'leve', 'moderado', 'grave']
+  }
+}, { _id: false });
+
+// Subdocumento: Lote evaluado (Paso 4 - Manejo de Pastoreo)
+const loteEvaluadoPastoreoSchema = new Schema({
+  nombre_lote: { type: String, trim: true },
+  area_m2: { type: Number },
+  topografia: {
+    type: String,
+    enum: ['Plano', 'Inclinación leve', 'Inclinación fuerte']
+  },
+
+  // Mediciones de forraje (opcional)
+  mediciones_forraje: {
+    se_realizaron: { type: Boolean, default: true },
+    motivo_no_realizacion: { type: String, trim: true },
+
+    // Mediciones de entrada
+    aforo_entrada_kg_ms_m2: { type: Number },
+    altura_entrada_cm: { type: Number },
+    hora_muestreo_ms: { type: String, trim: true },
+
+    // Mediciones de salida (opcional)
+    aforo_salida_kg_ms_m2: { type: Number },
+    altura_salida_cm: { type: Number },
+
+    // Ofertas (calculables)
+    oferta_forraje_verde_kg_vaca_dia: { type: Number },
+    oferta_area_m2_vaca_dia: { type: Number },
+    porcentaje_materia_seca: { type: Number },
+
+    // Mediciones químicas
+    grados_brix: { type: Number },
+    ph_hoja: { type: Number },
+    hora_muestreo_brix_ph: { type: String, trim: true }
+  },
+
+  // Puntos de muestreo (array dinámico, máximo 9)
+  puntos_muestreo: [puntoMuestreoSchema],
+
+  // Plagas y enfermedades
+  plagas_enfermedades: [plagaEnfermedadSchema]
+}, { _id: true });
+
 // Subdocumento: Lote individual (para Paso 2)
 // Representa una unidad productiva en el diagnóstico (ej: grupo de vacas en ordeño)
 const loteSchema = new Schema({
@@ -154,10 +292,48 @@ const datosGanaderiaSchema = new Schema({
     lotes_diferenciados: [loteDiferenciadoSchema]
   },
 
-  // Paso 4: Manejo de Pastoreo
+  // Paso 4: Manejo de Pastoreo y Forrajes
   manejo_pastoreo: {
-    sistema_pastoreo: String,
-    rotacion_dias: Number
+    // Sección A: Información General
+    general: {
+      finca_hace_aforo: { type: Boolean },
+      metodo_aforo: {
+        type: String,
+        enum: [
+          'Platómetro',
+          'Visual',
+          'Corte y peso',
+          'Bastón de aforo',
+          'No se hace en la finca'
+        ]
+      },
+
+      tipo_pastoreo: {
+        type: String,
+        enum: ['Rotacional', 'Continuo']
+      },
+
+      // Campos condicionales (solo si tipo_pastoreo === 'Rotacional')
+      periodo_rotacion_dias: { type: Number },
+      periodo_ocupacion_dias: { type: Number },
+      franja_pastoreo_m2: { type: Number },
+
+      // Especies de pasto (3 predominantes)
+      especies_pasto: [especiePastoSchema], // Máximo 3
+
+      cobertura_general: {
+        type: String,
+        enum: ['Alta', 'Media', 'Baja']
+      },
+      uniformidad_general: {
+        type: String,
+        enum: ['Buena', 'Irregular']
+      }
+    },
+
+    // Sección B: Lotes Evaluados
+    cuantos_lotes_evaluados: { type: Number, default: 0 },
+    lotes_evaluados: [loteEvaluadoPastoreoSchema]
   },
 
   // Paso 5-10: (definir según necesidad)
@@ -280,7 +456,10 @@ const datosFloresSchema = new Schema({
     lotes_diferenciados: [loteDiferenciadoSchema]
   },
 
-  // Paso 4-10: (definir según necesidad)
+  // Paso 4: Manejo de Cultivo (placeholder para Flores)
+  manejo_cultivo: Schema.Types.Mixed,
+
+  // Paso 5-10: (definir según necesidad)
   manejo_sanitario: Schema.Types.Mixed,
   fertilizacion: Schema.Types.Mixed, // DEPRECATED - Se movió a fertilizacion_fumigacion en Paso 3
   cosecha_poscosecha: Schema.Types.Mixed,
@@ -345,7 +524,10 @@ const datosFrutalesSchema = new Schema({
     lotes_diferenciados: [loteDiferenciadoSchema]
   },
 
-  // Paso 4-10: (definir según necesidad)
+  // Paso 4: Manejo de Cultivo (placeholder para Frutales)
+  manejo_cultivo: Schema.Types.Mixed,
+
+  // Paso 5-10: (definir según necesidad)
   manejo_sanitario: Schema.Types.Mixed,
   fertilizacion: Schema.Types.Mixed, // DEPRECATED - Se movió a fertilizacion_fumigacion en Paso 3
   cosecha_poscosecha: Schema.Types.Mixed,
