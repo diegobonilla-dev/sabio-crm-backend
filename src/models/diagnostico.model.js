@@ -516,6 +516,126 @@ const nutrienteSchema = new Schema({
   valor: { type: Number }
 }, { _id: false });
 
+// ============================================
+// PASO 4: MANEJO DE CULTIVO (FLORES) - SCHEMAS
+// ============================================
+
+// Subdocumento: Especie predominante floral (Paso 4)
+const especiePredomianteFloralSchema = new Schema({
+  especie: { type: String, trim: true },
+  orden: { type: Number } // 1, 2, 3, 4
+}, { _id: false });
+
+// Subdocumento: Punto de muestreo individual (Flores - Paso 4)
+const puntoMuestreoFloralSchema = new Schema({
+  coordenada_gps: { type: String, trim: true },
+  pendiente_porcentaje: { type: Number, min: 0, max: 100 },
+  aspecto_pendiente: {
+    type: String,
+    enum: ['N', 'S', 'E', 'O', 'NE', 'NO', 'SE', 'SO']
+  },
+
+  // VESS (Visual Evaluation of Soil Structure)
+  vess_colchon_pasto: { type: Number, enum: [1, 2, 3] },
+  vess_suelo: { type: Number, enum: [1, 2, 3, 4, 5] },
+
+  // Características del suelo
+  textura_predominante: {
+    type: String,
+    enum: ['Arenosa', 'Franca', 'Arcillosa']
+  },
+  color_predominante: {
+    type: String,
+    enum: ['Oscuro', 'Claro', 'Rojizo']
+  },
+  olor_predominante: {
+    type: String,
+    enum: ['Orgánico', 'Áspero', 'Ácido', 'Neutro']
+  },
+
+  // Compactación
+  penetrometro_200psi_cm: { type: Number, min: 0, max: 90 },
+  nivel_compactacion: {
+    type: String,
+    enum: ['Bajo', 'Medio', 'Alto']
+  },
+  evidencia_compactacion_superficial: { type: Boolean },
+
+  // Condiciones
+  drenaje: {
+    type: String,
+    enum: ['Adecuado', 'Deficiente']
+  },
+  evidencia_erosion: { type: Boolean },
+
+  // Salud de la cobertura/cultivo
+  puntuacion_salud_cobertura: { type: Number, enum: [0, 1, 2, 3] },
+  especies_no_deseadas_presentes: { type: Boolean },
+  nivel_especies_no_deseadas: {
+    type: String,
+    enum: ['Bajo', 'Medio', 'Alto']
+  },
+  sintomas_estres: [{
+    type: String,
+    enum: ['Sequía', 'Sobrepastoreo', 'Plagas', 'Ninguno']
+  }],
+
+  // Biodiversidad
+  lombrices_rojas: { type: Number, default: 0 },
+  lombrices_grises: { type: Number, default: 0 },
+  lombrices_blancas: { type: Number, default: 0 },
+  huevos_lombrices: { type: Number, default: 0 },
+  tipos_diferentes_huevos: { type: Number, default: 0 },
+  presencia_micelio_hongos: {
+    type: String,
+    enum: ['Abundante', 'Moderado', 'Poco', 'Ninguno']
+  },
+  raices_activas_visibles: {
+    type: String,
+    enum: ['Abundante', 'Moderado', 'Poco', 'Ninguno']
+  },
+
+  // Conductividad eléctrica
+  conductividad_electrica: { type: Number },
+
+  // Fotos (placeholders - URLs cuando se implemente upload)
+  foto_salud_cultivo: { type: String, trim: true },
+  foto_perfil_suelo: { type: String, trim: true },
+
+  // Observaciones
+  observaciones_punto: { type: String, trim: true }
+}, { _id: true });
+
+// Subdocumento: Plaga/Enfermedad individual (Flores - Paso 4)
+const plagaEnfermedadFloralSchema = new Schema({
+  nombre: { type: String, trim: true },
+  nivel_dano: {
+    type: String,
+    enum: ['sin_dano', 'leve', 'moderado', 'grave']
+  }
+}, { _id: false });
+
+// Subdocumento: Bloque evaluado (Flores - Paso 4)
+const bloqueEvaluadoFloralSchema = new Schema({
+  // Datos básicos
+  nombre_bloque: { type: String, trim: true },
+
+  // Información del bloque
+  area_bloque_m2: { type: Number },
+  coordenadas_gps_centro: { type: String, trim: true },
+  topografia_general: {
+    type: String,
+    enum: ['Plano', 'Inclinación leve', 'Inclinación fuerte']
+  },
+
+  // Puntos de muestreo (array dinámico, máximo 9)
+  puntos_muestreo: [puntoMuestreoFloralSchema],
+
+  // Plagas y enfermedades
+  plagas_enfermedades: [plagaEnfermedadFloralSchema],
+  otras_plagas_observadas: { type: String, trim: true }
+}, { _id: true });
+
 // Subdocumento: Bloque floral individual (para Paso 2 de Flores)
 const bloqueFloralSchema = new Schema({
   nombre_bloque: { type: String, trim: true },
@@ -595,8 +715,30 @@ const datosFloresSchema = new Schema({
     lotes_diferenciados: [loteDiferenciadoSchema]
   },
 
-  // Paso 4: Manejo de Cultivo (placeholder para Flores)
-  manejo_cultivo: Schema.Types.Mixed,
+  // Paso 4: Manejo de Cultivo (Flores)
+  manejo_cultivo: {
+    // Sección A: Información General (opcional, nivel finca)
+    general: {
+      metodo_plateo: [{ type: String }], // Múltiple: Guadaña, Manual, Herbicida, No se hace
+      deshierbe: [{ type: String }], // Múltiple: Guadaña, Manual, Herbicida, No se hace
+      frecuencia_plateo: {
+        type: String,
+        enum: ['Mensual', 'Bimestral', 'Trimestral', 'Dos veces al año']
+      },
+      especies_predominantes: [especiePredomianteFloralSchema], // Máximo 4
+      plantas_resembradas: { type: Number },
+      tipo_podas: [{ type: String }], // Múltiple: SANITARIA, FORMACION, PRODUCCION
+      ultimas_podas_realizadas: { type: String, trim: true },
+      cantidad_fertilizante_sintetico_por_cama: { type: Number },
+      usa_abono_organico: { type: Boolean },
+      tipos_abono_organico: { type: String, trim: true },
+      cantidad_abono_organico_por_cama: { type: Number }
+    },
+
+    // Sección B: Bloques Evaluados
+    cuantos_bloques_evaluados: { type: Number, default: 0 },
+    bloques_evaluados: [bloqueEvaluadoFloralSchema]
+  },
 
   // Paso 5-10: (definir según necesidad)
   manejo_sanitario: Schema.Types.Mixed,
