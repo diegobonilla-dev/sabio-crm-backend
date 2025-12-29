@@ -341,9 +341,7 @@ const datosGanaderiaSchema = new Schema({
   sanidad_animal: Schema.Types.Mixed,
   alimentacion: Schema.Types.Mixed,
   reproduccion: Schema.Types.Mixed,
-  infraestructura: Schema.Types.Mixed,
-  aspectos_economicos: Schema.Types.Mixed,
-  observaciones: Schema.Types.Mixed
+  infraestructura: Schema.Types.Mixed
 });
 
 // Subdocumento: Lote frutal individual (para Paso 2 de Frutales)
@@ -743,9 +741,7 @@ const datosFloresSchema = new Schema({
   // Paso 5-10: (definir según necesidad)
   manejo_sanitario: Schema.Types.Mixed,
   fertilizacion: Schema.Types.Mixed, // DEPRECATED - Se movió a fertilizacion_fumigacion en Paso 3
-  cosecha_poscosecha: Schema.Types.Mixed,
-  aspectos_economicos: Schema.Types.Mixed,
-  observaciones: Schema.Types.Mixed
+  cosecha_poscosecha: Schema.Types.Mixed
 });
 
 const datosFrutalesSchema = new Schema({
@@ -833,9 +829,7 @@ const datosFrutalesSchema = new Schema({
   // Paso 5-10: (definir según necesidad)
   manejo_sanitario: Schema.Types.Mixed,
   fertilizacion: Schema.Types.Mixed, // DEPRECATED - Se movió a fertilizacion_fumigacion en Paso 3
-  cosecha_poscosecha: Schema.Types.Mixed,
-  aspectos_economicos: Schema.Types.Mixed,
-  observaciones: Schema.Types.Mixed
+  cosecha_poscosecha: Schema.Types.Mixed
 });
 
 const datosCafeSchema = new Schema({
@@ -1083,6 +1077,84 @@ const biofabricaSchema = new Schema({
   }
 }, { _id: false });
 
+// PASO 8: OBSERVACIONES Y SEGUIMIENTO (Común para todos los tipos de finca)
+const medidaControlSchema = new Schema({
+  descripcion: {
+    type: String,
+    trim: true
+  }
+}, { _id: true });
+
+const recomendacionSchema = new Schema({
+  descripcion: {
+    type: String,
+    trim: true
+  }
+}, { _id: true });
+
+const observacionesSeguimientoSchema = new Schema({
+  // Observaciones técnicas
+  observaciones_tecnicas_visita: {
+    type: String,
+    trim: true
+  },
+  sintomas_visibles_adicionales: {
+    type: String,
+    trim: true
+  },
+
+  // Medidas de control (array dinámico)
+  medidas_control: [medidaControlSchema],
+
+  // Recomendaciones (array dinámico)
+  recomendaciones: [recomendacionSchema],
+
+  // Próxima visita
+  proxima_visita_programada: {
+    type: Date
+  },
+
+  // Muestras enviadas a laboratorio (dinámicas según lotes)
+  muestras_suelo_lotes: [{
+    nombre_lote: { type: String, trim: true },
+    seleccionado: { type: Boolean, default: false }
+  }],
+  muestra_forraje: {
+    type: Boolean,
+    default: false
+  },
+  muestra_agua: {
+    type: Boolean,
+    default: false
+  },
+
+  // Información de muestras
+  codigo_muestras: {
+    type: String,
+    trim: true
+  },
+  analisis_requeridos: {
+    type: String,
+    trim: true
+  },
+
+  // Fotografías y archivos
+  fotografias_tomadas_descripcion: {
+    type: String,
+    trim: true
+  },
+  links_archivos: {
+    type: String,
+    trim: true
+  },
+
+  // Observaciones del productor
+  observaciones_productor: {
+    type: String,
+    trim: true
+  }
+}, { _id: false });
+
 // Modelo principal
 const diagnosticoSchema = new Schema({
   // Relaciones
@@ -1138,7 +1210,10 @@ const diagnosticoSchema = new Schema({
   sostenibilidad: sostenibilidadSchema,
 
   // PASO 7: Biofábrica del Cliente (común para todos los tipos)
-  biofabrica: biofabricaSchema
+  biofabrica: biofabricaSchema,
+
+  // PASO 8: Observaciones y Seguimiento (común para todos los tipos)
+  observaciones_seguimiento: observacionesSeguimientoSchema
 
 }, {
   timestamps: true
