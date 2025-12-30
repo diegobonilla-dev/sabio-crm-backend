@@ -1155,6 +1155,71 @@ const observacionesSeguimientoSchema = new Schema({
   }
 }, { _id: false });
 
+// PASO 9: VALIDACIÓN Y CIERRE (Común para todos los tipos de finca)
+const validacionCierreSchema = new Schema({
+  // Hora de finalización
+  fecha_finalizacion: {
+    type: Date
+  },
+  hora_finalizacion: {
+    type: String,
+    trim: true
+  },
+
+  // Revisión del día a día
+  revision_visita: {
+    type: String,
+    trim: true
+  },
+
+  // Firmas de validación
+  firma_tecnico: {
+    nombre_completo: {
+      type: String,
+      trim: true
+    },
+    cedula: {
+      type: String,
+      trim: true
+    },
+    firma_digital: {
+      type: String  // Base64 PNG del canvas
+    }
+  },
+
+  firma_productor: {
+    nombre_completo: {
+      type: String,
+      trim: true
+    },
+    cedula: {
+      type: String,
+      trim: true
+    },
+    firma_digital: {
+      type: String  // Base64 PNG del canvas
+    }
+  },
+
+  // Resumen de validación (calculado automáticamente)
+  resumen: {
+    diagnosticos_completos: {
+      type: Number,
+      default: 0
+    },
+    muestras_enviadas: {
+      type: Number,
+      default: 0
+    }
+  },
+
+  // Aceptación de términos y condiciones
+  acepta_terminos: {
+    type: Boolean,
+    default: false
+  }
+}, { _id: false });
+
 // Modelo principal
 const diagnosticoSchema = new Schema({
   // Relaciones
@@ -1213,7 +1278,10 @@ const diagnosticoSchema = new Schema({
   biofabrica: biofabricaSchema,
 
   // PASO 8: Observaciones y Seguimiento (común para todos los tipos)
-  observaciones_seguimiento: observacionesSeguimientoSchema
+  observaciones_seguimiento: observacionesSeguimientoSchema,
+
+  // PASO 9: Validación y Cierre (común para todos los tipos)
+  validacion_cierre: validacionCierreSchema
 
 }, {
   timestamps: true
