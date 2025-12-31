@@ -5,7 +5,7 @@ import {
   healthCheck,
 } from '../controllers/image.controller.js';
 import upload from '../middlewares/upload.middleware.js';
-import { verifyToken } from '../middlewares/auth.middleware.js';
+import { protect } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
@@ -20,7 +20,7 @@ const router = Router();
  * Ruta para subir una sola imagen
  * Requiere autenticación
  */
-router.post('/upload', verifyToken, upload.single('image'), uploadImage);
+router.post('/upload', protect, upload.single('image'), uploadImage);
 
 /**
  * Ruta para subir múltiples imágenes
@@ -28,7 +28,7 @@ router.post('/upload', verifyToken, upload.single('image'), uploadImage);
  */
 router.post(
   '/upload-multiple',
-  verifyToken,
+  protect,
   upload.array('images', 10), // Máximo 10 imágenes
   uploadMultipleImages
 );
