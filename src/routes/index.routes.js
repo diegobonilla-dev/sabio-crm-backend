@@ -11,6 +11,7 @@ import operacionesRoutes from './operaciones.routes.js';
 import visitaRoutes from './visita.routes.js'
 import corporativoRoutes from './corporativo.routes.js';
 import diagnosticoRoutes from './diagnostico.routes.js';
+import imageRoutes from './image.routes.js';
 
 const router = Router();
 
@@ -49,5 +50,7 @@ router.use('/operaciones', operacionesRoutes);
 router.use('/visitas', visitaRoutes);
 //diagnósticos
 router.use('/diagnosticos', diagnosticoRoutes);
+//imágenes
+router.use('/images', imageRoutes);
 
 export default router;
