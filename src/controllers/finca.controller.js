@@ -2,6 +2,7 @@
 import Finca from '../models/finca.model.js';
 import Empresa from '../models/empresa.model.js';
 import Corporativo from '../models/corporativo.model.js';
+import Ubicacion from '../models/ubicacion.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
 /**
@@ -12,17 +13,34 @@ export const createFinca = asyncHandler(async (req, res) => {
   const { empresaId } = req.params;
   const { nombre, area, municipio, departamento, cultivo_principal, tipo_produccion, vereda, coordenadas_gps } = req.body;
 
-  if (!nombre || !area) {
+  // Validación básica
+  if (!nombre || !area || !departamento || !municipio) {
     res.status(400);
-    throw new Error('Nombre y área son obligatorios');
+    throw new Error('Nombre, área, departamento y municipio son obligatorios');
+  }
+
+  // Validar que el departamento exista en la BD
+  const ubicacion = await Ubicacion.findOne({
+    departamento: departamento.toUpperCase()
+  });
+
+  if (!ubicacion) {
+    res.status(400);
+    throw new Error('Departamento no válido');
+  }
+
+  // Validar que el municipio pertenezca al departamento
+  if (!ubicacion.municipios.includes(municipio.toUpperCase())) {
+    res.status(400);
+    throw new Error('Municipio no válido para el departamento seleccionado');
   }
 
   const newFinca = new Finca({
     empresa_owner: empresaId,
     nombre,
     area,
-    municipio,
-    departamento,
+    municipio: municipio.toUpperCase(),
+    departamento: departamento.toUpperCase(),
     cultivo_principal,
     tipo_produccion,
     vereda,
@@ -93,6 +111,41 @@ export const updateFinca = asyncHandler(async (req, res) => {
   if (!finca) {
     res.status(404);
     throw new Error('Finca no encontrada');
+  }
+
+  // Si se está actualizando departamento o municipio, validar
+  if (req.body.departamento || req.body.municipio) {
+    const departamentoToValidate = req.body.departamento || finca.departamento;
+    const municipioToValidate = req.body.municipio || finca.municipio;
+
+    if (!departamentoToValidate || !municipioToValidate) {
+      res.status(400);
+      throw new Error('Departamento y municipio son obligatorios');
+    }
+
+    // Validar que el departamento exista
+    const ubicacion = await Ubicacion.findOne({
+      departamento: departamentoToValidate.toUpperCase()
+    });
+
+    if (!ubicacion) {
+      res.status(400);
+      throw new Error('Departamento no válido');
+    }
+
+    // Validar que el municipio pertenezca al departamento
+    if (!ubicacion.municipios.includes(municipioToValidate.toUpperCase())) {
+      res.status(400);
+      throw new Error('Municipio no válido para el departamento seleccionado');
+    }
+
+    // Normalizar a mayúsculas
+    if (req.body.departamento) {
+      req.body.departamento = req.body.departamento.toUpperCase();
+    }
+    if (req.body.municipio) {
+      req.body.municipio = req.body.municipio.toUpperCase();
+    }
   }
 
   const camposPermitidos = [

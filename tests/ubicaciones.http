@@ -1,0 +1,92 @@
+### Variables
+@baseUrl = http://localhost:4000/api/v1
+@token = YOUR_JWT_TOKEN_HERE
+
+### 1. Health Check
+GET {{baseUrl}}/health
+
+### 2. Obtener todos los departamentos
+GET {{baseUrl}}/ubicaciones/departamentos
+Authorization: Bearer {{token}}
+
+### 3. Obtener municipios de Antioquia
+GET {{baseUrl}}/ubicaciones/municipios/ANTIOQUIA
+Authorization: Bearer {{token}}
+
+### 4. Obtener municipios de Cundinamarca
+GET {{baseUrl}}/ubicaciones/municipios/CUNDINAMARCA
+Authorization: Bearer {{token}}
+
+### 5. Obtener municipios de Antioquia (lowercase - debe funcionar)
+GET {{baseUrl}}/ubicaciones/municipios/antioquia
+Authorization: Bearer {{token}}
+
+### 6. Intentar obtener municipios de departamento que no existe (debe fallar)
+GET {{baseUrl}}/ubicaciones/municipios/DEPARTAMENTO_FALSO
+Authorization: Bearer {{token}}
+
+### 7. Crear finca con departamento/municipio válidos
+POST {{baseUrl}}/fincas/EMPRESA_ID_AQUI
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Finca Test Ubicaciones",
+  "area": 50,
+  "tipo_produccion": "Cafe",
+  "departamento": "ANTIOQUIA",
+  "municipio": "MEDELLÍN",
+  "cultivo_principal": "Café Arábigo"
+}
+
+### 8. Intentar crear finca sin departamento (debe fallar)
+POST {{baseUrl}}/fincas/EMPRESA_ID_AQUI
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Finca Test Sin Departamento",
+  "area": 30,
+  "tipo_produccion": "Cafe",
+  "municipio": "MEDELLÍN"
+}
+
+### 9. Intentar crear finca con departamento inválido (debe fallar)
+POST {{baseUrl}}/fincas/EMPRESA_ID_AQUI
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Finca Test Invalid Dept",
+  "area": 30,
+  "tipo_produccion": "Cafe",
+  "departamento": "DEPARTAMENTO_FALSO",
+  "municipio": "MUNICIPIO_FALSO"
+}
+
+### 10. Intentar crear finca con municipio inválido (debe fallar)
+POST {{baseUrl}}/fincas/EMPRESA_ID_AQUI
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Finca Test Invalid Municipality",
+  "area": 30,
+  "tipo_produccion": "Cafe",
+  "departamento": "ANTIOQUIA",
+  "municipio": "MUNICIPIO_QUE_NO_EXISTE"
+}
+
+### 11. Crear finca con lowercase (debe funcionar y guardar en MAYÚSCULAS)
+POST {{baseUrl}}/fincas/EMPRESA_ID_AQUI
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Finca Test Lowercase",
+  "area": 40,
+  "tipo_produccion": "Frutales",
+  "departamento": "antioquia",
+  "municipio": "envigado",
+  "cultivo_principal": "Aguacate Hass"
+}

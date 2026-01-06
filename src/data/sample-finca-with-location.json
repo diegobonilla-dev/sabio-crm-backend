@@ -1,0 +1,37 @@
+{
+  "_id": "507f1f77bcf86cd799439011",
+  "empresa_owner": "507f1f77bcf86cd799439012",
+  "nombre": "Finca La Esperanza",
+  "area": 50.5,
+  "departamento": "ANTIOQUIA",
+  "municipio": "MEDELLÍN",
+  "vereda": "Santa Elena",
+  "coordenadas_gps": "6.2442, -75.5812",
+  "tipo_produccion": "Flores",
+  "cultivo_principal": "Rosas",
+  "divisiones_primarias": [
+    {
+      "nombre": "Bloque A",
+      "imagen": "https://cloudinary.com/bloque-a.jpg",
+      "divisiones_secundarias": [
+        {
+          "nombre": "Nave 1",
+          "divisiones_terciarias": [
+            { "nombre": "Cama 1" },
+            { "nombre": "Cama 2" },
+            { "nombre": "Cama 3" }
+          ]
+        },
+        {
+          "nombre": "Nave 2",
+          "divisiones_terciarias": [
+            { "nombre": "Cama 1" },
+            { "nombre": "Cama 2" }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2026-01-06T12:00:00.000Z",
+  "updatedAt": "2026-01-06T12:00:00.000Z"
+}

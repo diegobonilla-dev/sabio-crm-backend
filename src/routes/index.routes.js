@@ -12,6 +12,7 @@ import visitaRoutes from './visita.routes.js'
 import corporativoRoutes from './corporativo.routes.js';
 import diagnosticoRoutes from './diagnostico.routes.js';
 import imageRoutes from './image.routes.js';
+import ubicacionRoutes from './ubicacion.routes.js';
 
 const router = Router();
 
@@ -52,5 +53,7 @@ router.use('/visitas', visitaRoutes);
 router.use('/diagnosticos', diagnosticoRoutes);
 //imágenes
 router.use('/images', imageRoutes);
+//ubicaciones (departamentos y municipios de Colombia)
+router.use('/ubicaciones', ubicacionRoutes);
 
 export default router;
