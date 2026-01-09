@@ -9,12 +9,18 @@ export const createDiagnostico = asyncHandler(async (req, res) => {
     tipo_diagnostico,
     fecha_visita,
     hora_inicio,
+    estado,
     informacion_general,
     datos_ganaderia,
     datos_flores,
     datos_frutales,
     datos_cafe,
-    datos_aguacate
+    datos_aguacate,
+    indicadores_p4g,
+    sostenibilidad,
+    biofabrica,
+    observaciones_seguimiento,
+    validacion_cierre
   } = req.body;
 
   // Validar campos obligatorios
@@ -30,6 +36,18 @@ export const createDiagnostico = asyncHandler(async (req, res) => {
     throw new Error('Finca no encontrada');
   }
 
+  // LOG TEMPORAL PARA DEBUGGING - REMOVER EN PRODUCCIÓN
+  console.log('🔍 Campos recibidos en req.body:', {
+    finca: !!finca,
+    tipo_diagnostico: !!tipo_diagnostico,
+    estado: !!estado,
+    indicadores_p4g: !!indicadores_p4g,
+    sostenibilidad: !!sostenibilidad,
+    biofabrica: !!biofabrica,
+    observaciones_seguimiento: !!observaciones_seguimiento,
+    validacion_cierre: !!validacion_cierre
+  });
+
   // Crear diagnóstico
   const nuevoDiagnostico = new Diagnostico({
     finca,
@@ -37,15 +55,32 @@ export const createDiagnostico = asyncHandler(async (req, res) => {
     tipo_diagnostico,
     fecha_visita,
     hora_inicio,
+    estado,
     informacion_general,
     datos_ganaderia,
     datos_flores,
     datos_frutales,
     datos_cafe,
-    datos_aguacate
+    datos_aguacate,
+    indicadores_p4g,
+    sostenibilidad,
+    biofabrica,
+    observaciones_seguimiento,
+    validacion_cierre
   });
 
   const diagnosticoGuardado = await nuevoDiagnostico.save();
+
+  // LOG TEMPORAL PARA DEBUGGING - REMOVER EN PRODUCCIÓN
+  console.log('💾 Diagnóstico guardado en DB:', {
+    _id: diagnosticoGuardado._id,
+    estado: diagnosticoGuardado.estado,
+    tiene_indicadores_p4g: !!diagnosticoGuardado.indicadores_p4g,
+    tiene_sostenibilidad: !!diagnosticoGuardado.sostenibilidad,
+    tiene_biofabrica: !!diagnosticoGuardado.biofabrica,
+    tiene_observaciones: !!diagnosticoGuardado.observaciones_seguimiento,
+    tiene_validacion: !!diagnosticoGuardado.validacion_cierre
+  });
 
   res.status(201).json({
     message: 'Diagnóstico creado exitosamente',
@@ -120,7 +155,9 @@ export const updateDiagnostico = asyncHandler(async (req, res) => {
     'datos_aguacate',
     'indicadores_p4g',
     'sostenibilidad',
-    'biofabrica'
+    'biofabrica',
+    'observaciones_seguimiento',
+    'validacion_cierre'
   ];
 
   camposPermitidos.forEach(campo => {
